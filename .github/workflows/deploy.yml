@@ -15,8 +15,8 @@ jobs:
 
     env:
       AWS_REGION: ap-south-1
-      S3_BUCKET: your-deploy-bucket
-      EC2_INSTANCE_ID: i-0123456789abcdef0
+      S3_BUCKET: myapp-artifact-storage-bucket
+      EC2_INSTANCE_ID: i-0227979605b40b0d4
       IAM_ROLE_ARN: arn:aws:iam::654485376127:role/github-actions-deploy-role
 
     steps:
