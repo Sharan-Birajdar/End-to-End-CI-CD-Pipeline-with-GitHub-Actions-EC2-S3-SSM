@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # 👈 Manual trigger added
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -16,7 +16,7 @@ jobs:
     env:
       AWS_REGION: ap-south-1
       S3_BUCKET: myapp-artifact-storage-bucket
-      EC2_INSTANCE_ID: 15.207.248.130
+      EC2_INSTANCE_ID: i-0227979605b40b0d4   # ✅ FIXED (use real instance ID)
       IAM_ROLE_ARN: arn:aws:iam::654485376127:role/github-actions-deploy-role
 
     steps:
@@ -40,7 +40,13 @@ jobs:
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids "${{ env.EC2_INSTANCE_ID }}" \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=["bash /home/ec2-user/deploy.sh"]' \
+            --parameters 'commands=[
+              "cd /home/ubuntu",
+              "aws s3 cp s3://${{ env.S3_BUCKET }}/app.tar.gz .",
+              "tar -xzf app.tar.gz",
+              "chmod +x scripts/deploy.sh",
+              "./scripts/deploy.sh"
+            ]' \
             --query "Command.CommandId" \
             --output text)
 
