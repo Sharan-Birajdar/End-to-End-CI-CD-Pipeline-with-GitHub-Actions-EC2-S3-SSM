@@ -21,7 +21,7 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::654485376127:role/GitHubActionsRole
+        role-to-assume: arn:aws:iam::654485376127:role/github-actions-role
         aws-region: ap-south-1
 
     - name: Upload artifact to S3
