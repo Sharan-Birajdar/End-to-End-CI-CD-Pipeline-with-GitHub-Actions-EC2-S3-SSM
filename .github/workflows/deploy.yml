@@ -14,23 +14,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::654485376127:role/github-actions-role
+          aws-region: ap-south-1
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: arn:aws:iam::654485376127:role/github-actions-role
-        aws-region: ap-south-1
+      - name: Upload artifact to S3
+        run: |
+          aws s3 cp index.html s3://devops-artifact-bucket-storage/index.html
 
-    - name: Upload artifact to S3
-      run: |
-        aws s3 cp index.html s3://devops-artifact-bucket-storage/index.html
-
-    - name: Deploy using SSM
-      run: |
-        aws ssm send-command \
-        --instance-ids secrets.EC2_INSTANCE_ID \
-        --document-name "AWS-RunShellScript" \
-        --parameters commands="aws s3 cp s3://devops-artifact-bucket-storage/index.html /var/www/html/index.html"
+      - name: Deploy using SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --parameters commands='[
+              "aws s3 cp s3://devops-artifact-bucket-storage/index.html /var/www/html/index.html"
+            ]' \
+            --region ap-south-1
